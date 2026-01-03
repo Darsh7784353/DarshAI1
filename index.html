@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Darsh AI</title>
+    <style>
+        :root {
+            --bg: #05070a;
+            --glass: rgba(18, 20, 28, 0.95);
+            --accent: #c084fc; 
+            --text: #f1f5f9;
+            --input-bg: rgba(255,255,255,0.05);
+        }
+
+        .light-mode {
+            --bg: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.9);
+            --accent: #9333ea;
+            --text: #0f172a;
+            --input-bg: rgba(0,0,0,0.05);
+        }
+
+        body { 
+            background: var(--bg);
+            background-image: radial-gradient(circle at top right, var(--accent), transparent 500px);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; transition: background 0.5s ease;
+        }
+
+        .container {
+            width: 650px; height: 90vh;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 32px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .header h1 { margin: 0; font-size: 1.2rem; letter-spacing: 3px; color: var(--accent); font-weight: 800; }
+
+        #chat { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scrollbar-width: none; }
+
+        .bubble { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 14px; line-height: 1.6; animation: slide 0.3s ease; }
+        @keyframes slide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .ai-msg { background: rgba(255,255,255,0.06); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .user-msg { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .input-area { padding: 20px; display: flex; gap: 12px; background: rgba(0,0,0,0.2); align-items: center; }
+        input { flex: 1; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 15px; color: var(--text); outline: none; }
+
+        .icon-btn { cursor: pointer; background: rgba(255,255,255,0.1); border: none; width: 45px; height: 45px; border-radius: 50%; color: var(--text); display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        
+        .listening { background: #ff4757 !important; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); } 70% { transform: scale(1.1); } 100% { transform: scale(0.95); } }
+
+        .footer { padding: 12px; font-size: 11px; text-align: center; color: var(--text); opacity: 0.5; border-top: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>DARSH AI</h1>
+        <div style="display:flex; gap:10px;">
+            <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="Toggle Sound">🔊</button>
+            <button class="icon-btn" onclick="clearChat()">🗑</button>
+            <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+        </div>
+    </div>
+    
+    <div id="chat">
+        <div class="bubble ai-msg" id="greeting">System online...</div>
+    </div>
+
+    <div class="input-area">
+        <button class="icon-btn" id="micBtn" onclick="listen()" title="Speak to Darsh AI">🎤</button>
+        <input type="text" id="userInput" placeholder="Ask me something..." autocomplete="off">
+        <button onclick="talk()" style="background: var(--accent); border:none; padding: 15px 25px; border-radius:16px; color:white; cursor:pointer; font-weight:bold;">SEND</button>
+    </div>
+
+    <div class="footer" id="clock">00:00:00</div>
+</div>
+
+<script>
+    let isMuted = false;
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        document.getElementById('muteBtn').innerText = isMuted ? "静" : "🔊";
+        document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊";
+        if (isMuted) window.speechSynthesis.cancel();
+    }
+
+    const BRAIN = {
+        // GREETINGS
+        "hi": "Hello, Glad to see you how can i help.",
+        "hello": "Hello, Glad to see you how can i help.",
+        "hey": "Hello, Glad to see you how can i help.",
+
+        // CREATOR INFO
+        "who is darsh": "He is an 12 year old developer who is the Creator of me and he is an intelligent guy behind me who codes me.",
+	"who is father of darsh": "Ashok Korale he is the father of brilliant Darsh.",
+	"who are you": "I am Darsh AI",
+	"when you get updated": "I get updated every Sunday with new skills",
+	"when you were released": "I was released on 4th Jan 2026",
+        "who made you": "I was created by Darsh, a brilliant 12 year old coder using Pure HTML/CSS",
+        
+        // LOGIC & RIDDLES
+        "what has keys but no locks": "A piano.",
+        "what gets wetter the more it dries": "A towel.",
+        "if a plane crashes on the border of us and canada where do you bury the survivors": "You don't bury survivors!",
+        "what can travel around the world while staying in a corner": "A stamp.",
+        "is 0 a positive or negative number": "Neither. Zero is a neutral integer.",
+        "what has hands but cannot clap": "A clock.",
+        "what has one eye but cannot see": "A needle.",
+        "riddle me": "What has keys but no locks, space but no room, and allows you to enter but never leave? (Answer: A keyboard!)",
+
+        // COMPUTER SCIENCE
+        "what is hardware": "The physical parts of a computer, like the keyboard, mouse, and CPU.",
+        "what is software": "The programs and instructions that tell a computer what to do.",
+        "what is binary": "A system of numbers using only 0 and 1, which is the native language of computers.",
+        "what is coding": "The process of using a programming language to give instructions to a computer.",
+        "what is cpu": "The CPU (Central Processing Unit) is the brain of the computer where calculations happen.",
+        "what is ram": "RAM is the computer's short-term memory used for active tasks.",
+        "what is an operating system": "Software that manages computer hardware, like Windows, macOS, or Linux.",
+        "who invented computer": "Charles Babbage is known as the father of computers.",
+        "what is the cloud": "Servers accessed over the Internet to store and process data.",
+
+        // SCIENCE & SPACE
+        "gas we breathe in": "Oxygen.",
+        "gas we breathe out": "Carbon Dioxide.",
+        "speed of light": "Approximately 299,792,458 meters per second.",
+        "speed of sound": "Approximately 343 meters per second in air.",
+        "planet with rings": "Saturn is the most famous one, but Jupiter, Uranus, and Neptune have them too.",
+        "red planet": "Mars is known as the Red Planet due to iron oxide on its surface.",
+        "largest planet": "Jupiter is the largest planet in our solar system.",
+        "center of an atom": "The Nucleus.",
+        "what is photosynthesis": "The process plants use to turn sunlight and CO2 into food.",
+
+        // GEOGRAPHY & HISTORY
+        "largest country by area": "Russia.",
+        "country with most people": "India.",
+        "largest rainforest": "The Amazon Rainforest.",
+        "deepest point in ocean": "The Mariana Trench.",
+        "capital of india": "New Delhi.",
+        "when did india get independence": "August 15, 1947.",
+        "first president of usa": "George Washington.",
+        "who built pyramids": "The ancient Egyptians."
+    };
+
+    const JOKES = [
+        "Why did the computer go to the doctor? Because it had a virus!",
+        "Why do programmers prefer dark mode? Because light attracts bugs.",
+        "How many tickles does it take to make an octopus laugh? Ten-tickles!",
+        "What do you call a fake noodle? An Impasta!",
+        "Why did the student eat his homework? Because his teacher said it was a piece of cake!"
+    ];
+
+    function speak(text) {
+        if (isMuted) return;
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1;
+        utterance.pitch = 1.1;
+        synth.speak(utterance);
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.onstart = () => { document.getElementById('micBtn').classList.add('listening'); };
+        recognition.onend = () => { document.getElementById('micBtn').classList.remove('listening'); };
+        recognition.onresult = (event) => {
+            document.getElementById('userInput').value = event.results[0][0].transcript;
+            talk();
+        };
+        function listen() { recognition.start(); }
+    }
+
+    function talk() {
+        const input = document.getElementById('userInput');
+        const rawInput = input.value.trim();
+        const query = rawInput.toLowerCase().replace(/[?.,!]/g, "");
+        if(!rawInput) return;
+
+        addBubble(rawInput, 'user-msg');
+        input.value = '';
+
+        setTimeout(() => {
+            let reply = "I haven't learned that yet. My developer Darsh is working on it!";
+            
+            if (query.includes("joke")) {
+                reply = JOKES[Math.floor(Math.random() * JOKES.length)];
+            } else if (BRAIN[query]) {
+                reply = BRAIN[query];
+            } else {
+                try {
+                    if (/^[0-9+\-*/().\s]+$/.test(rawInput)) {
+                        reply = "Calculated: " + eval(rawInput);
+                    }
+                } catch (e) {}
+            }
+            
+            addBubble(reply, 'ai-msg');
+            speak(reply);
+        }, 400);
+    }
+
+    function addBubble(text, cls) {
+        const b = document.createElement('div');
+        b.className = `bubble ${cls}`;
+        b.innerText = text;
+        const chat = document.getElementById('chat');
+        chat.appendChild(b);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function toggleTheme() { document.body.classList.toggle('light-mode'); }
+    function clearChat() { document.getElementById('chat').innerHTML = ''; }
+    
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = "SYSTEM TIME: " + now.toLocaleTimeString();
+        const hrs = now.getHours();
+        let greet = hrs < 12 ? "Good Morning" : (hrs < 17 ? "Good Afternoon" : "Good Evening");
+        const greetDiv = document.getElementById('greeting');
+        if(greetDiv.innerText === "System online...") {
+            const welcomeText = `${greet}, Hello You can talk to me now.`;
+            greetDiv.innerText = welcomeText;
+            speak(welcomeText);
+        }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    document.getElementById('userInput').onkeypress = (e) => { if(e.key==='Enter') talk(); };
+</script>
+
+</body>
+</html>

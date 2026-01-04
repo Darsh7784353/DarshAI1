@@ -109,14 +109,13 @@
 
         // CREATOR INFO
         "who is darsh": "He is an 12 year old developer who is the Creator of me and he is an intelligent guy behind me who codes me.",
-	"who is father of darsh": "Ashok Korale he is the father of brilliant Darsh.",
-	"who are you": "I am Darsh AI",
-	"when you get updated": "I get updated every Sunday with new skills",
-	"when you were released": "I was released on 4th Jan 2026",
-        "who made you": "I was created by Darsh, a brilliant 12 year old coder using Pure HTML/CSS",
+        "who made you": "I was created by Darsh, a brilliant 12 year old coder.",
+	"who is father of darsh": "Ashok Korale is father of Darsh.",
+	"who is brother of darsh": "Shriansh Korale is the brother of Darsh.",
+	"who is shriansh korale": "Shriansh Korale is an brother of Darsh.Shriansh is 4 years old",
+	"who is ashok korale": "Ashok Korale is father of Darsh.Ashok Korale is 44 years old",
         
         // LOGIC & RIDDLES
-        "what has keys but no locks": "A piano.",
         "what gets wetter the more it dries": "A towel.",
         "if a plane crashes on the border of us and canada where do you bury the survivors": "You don't bury survivors!",
         "what can travel around the world while staying in a corner": "A stamp.",
@@ -146,11 +145,13 @@
         "largest planet": "Jupiter is the largest planet in our solar system.",
         "center of an atom": "The Nucleus.",
         "what is photosynthesis": "The process plants use to turn sunlight and CO2 into food.",
+	"what is height of flying plane": "Planes fly at different heights, but most commercial airliners cruise between 30,000 to 42,000 feet (9-13 km), above most weather, for better fuel efficiency in thinner air. Small planes fly lower (10,000-15,000 ft).",
 
         // GEOGRAPHY & HISTORY
         "largest country by area": "Russia.",
         "country with most people": "India.",
         "largest rainforest": "The Amazon Rainforest.",
+	"who is first prime minister of india": "Jawaharlal Nehru is First Prime Minister of India.",
         "deepest point in ocean": "The Mariana Trench.",
         "capital of india": "New Delhi.",
         "when did india get independence": "August 15, 1947.",
@@ -235,7 +236,7 @@
         let greet = hrs < 12 ? "Good Morning" : (hrs < 17 ? "Good Afternoon" : "Good Evening");
         const greetDiv = document.getElementById('greeting');
         if(greetDiv.innerText === "System online...") {
-            const welcomeText = `${greet}, Hello You can talk to me now.`;
+            const welcomeText = `${greet},  I am Darsh AI You can talk to me now.`;
             greetDiv.innerText = welcomeText;
             speak(welcomeText);
         }
